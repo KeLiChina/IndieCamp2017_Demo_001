@@ -12,19 +12,20 @@ public enum RoleStatus
 }
 public class RoleBase : MonoBehaviour
 {
-	[HideInInspector]
+    [HideInInspector]
     public RoleStatus m_Status;
-	[HideInInspector]
+    public SpriteRenderer m_SpRender;
+
     public float speed = 0;
-    private float dic = 1;
+    private Vector2 m_Vec = Vector2.zero;
     private Vector3 Temp_WalkDis = Vector3.zero;
     private Rigidbody2D m_Rigidbody;
-	private Animator m_Animator;
+    public Animator m_Animator;
 
-    public float M_Dic
+    public Vector2 M_Vec
     {
-        get { return dic; }
-        set { dic = value; }
+        get { return m_Vec; }
+        set { m_Vec = value; }
     }
     public RoleStatus M_Status
     {
@@ -34,7 +35,7 @@ public class RoleBase : MonoBehaviour
     protected virtual void Awake()
     {
         m_Rigidbody = GetComponent<Rigidbody2D>();
-		m_Animator = GetComponentInChildren<Animator>();
+
     }
     protected virtual void Start()
     {
@@ -44,18 +45,30 @@ public class RoleBase : MonoBehaviour
 
     protected virtual void Update()
     {
-        Idle();
+        
+        Flip();
     }
     // update
-    public virtual void Walk()
+    public virtual void Walk(Vector2 vec)
     {
-		float temp = 0.1f;
+        float temp = 0.1f;
         if (m_Status != RoleStatus.Jump)
             m_Status = RoleStatus.Move;
-		Temp_WalkDis = transform.position;
-		m_Animator.SetTrigger("Move");
-        float drive = (dic * speed*temp) + transform.position.x;
-        Temp_WalkDis.x = drive;
+        Temp_WalkDis = transform.position;
+        m_Animator.SetBool("Move",true);
+        m_Animator.SetBool("Jump",false);
+         m_Animator.SetBool("Idle",false);
+        vec = vec.normalized;
+
+        if (m_Rigidbody != null)
+        {
+            m_Rigidbody.MovePosition(transform.position + (Vector3)vec * Time.deltaTime * speed);
+        }
+        else
+        {
+            transform.Translate((Vector3)vec * Time.deltaTime * speed);
+        }
+
         transform.position = Temp_WalkDis;
     }
     // trigger
@@ -63,30 +76,43 @@ public class RoleBase : MonoBehaviour
     {
         if (m_Status == RoleStatus.Jump)
             return;
-		m_Animator.SetTrigger("Jump");
+        m_Animator.SetBool("Jump",true);
+         m_Animator.SetBool("Move",false);
+         m_Animator.SetBool("Idle",false);
         m_Status = RoleStatus.Jump;
-        m_Rigidbody.AddForce(new Vector2(0, 1));
+        m_Rigidbody.AddForce(new Vector2(0, 1) * 600);
+        Debug.Log("Is Jump");
     }
-    protected virtual void OnTriggerEnter2D(Collider2D other)
+    protected virtual void  OnCollisionEnter2D(Collision2D coll) 
     {
-        m_Status = RoleStatus.Idle;
+        Idle();
+       Debug.Log("Trigger Enter "+ coll.gameObject.name);
     }
-	// update
-	public virtual void Idle()
-	{
-		if (m_Status != RoleStatus.Jump || speed != 0)
+    // update
+    public virtual void Idle()
+    {
+     
+            m_Animator.SetBool("Idle",true);
+        m_Animator.SetBool("Jump",false);
+           m_Animator.SetBool("Move",false);
             m_Status = RoleStatus.Idle;
-		m_Animator.SetTrigger("Idle");
-	}
-	public virtual void Flip()
-	{
-		if (M_Dic == 1)
-		{
+        
 
-		}
-		else if (M_Dic == -1)
-		{
-			
-		}
-	}
+
+    }
+    public virtual void Flip()
+    {
+        if (m_Vec.x == 0)
+        {
+            return;
+        }
+        else if (m_Vec.x > 0)
+        {
+            m_SpRender.flipX = false;
+        }
+        else if (m_Vec.x < 0)
+        {
+            m_SpRender.flipX = true;
+        }
+    }
 }

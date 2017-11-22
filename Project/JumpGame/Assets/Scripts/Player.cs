@@ -7,17 +7,18 @@ public class Player : RoleBase {
 protected override void Update()
     {
 		base.Update();
-		if (Input.GetKeyDown(KeyCode.A))
+		M_Vec = Vector2.zero;
+		if (Input.GetKey(KeyCode.A))
 		{
-			M_Dic = -1;
-			speed = 1;
-			Walk();
+			M_Vec = new Vector2(-1,0);
+	
+			Walk(M_Vec);
 		}
-		if (Input.GetKeyDown(KeyCode.D))
+		if (Input.GetKey(KeyCode.D))
 		{
-			M_Dic = 1;
-			speed = 1;
-			Walk();
+			M_Vec = new Vector2(1,0);
+			
+			Walk(M_Vec);
 		}
 		if (Input.GetKeyDown(KeyCode.Space))
 		{
@@ -25,7 +26,7 @@ protected override void Update()
 		}
 		if (Input.GetKeyUp(KeyCode.A)||Input.GetKeyUp(KeyCode.D))
 		{
-			speed = 0;
+			Idle();
 		}
 
     }
