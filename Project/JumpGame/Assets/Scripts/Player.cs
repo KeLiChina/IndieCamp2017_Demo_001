@@ -36,7 +36,7 @@ public class Player : RoleBase
         }
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
         {
-            Idle();
+            // Idle();
         }
            
     }
