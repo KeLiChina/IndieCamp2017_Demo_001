@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XboxCtrlrInput;
 
 public class Player : RoleBase
 {
@@ -22,11 +23,11 @@ public class Player : RoleBase
     {
 		base.Update();
         grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
-        if (Input.GetKeyDown(KeyCode.Space)&& grounded)
+        if (XCI.GetButtonDown(XboxButton.A)&& grounded)
 		{
 			 jump = true;
 		}
-		 if (Input.GetKey(KeyCode.A))
+		 if  (XCI.GetAxis(XboxAxis.LeftStickX )!=0 || Input.GetKey(KeyCode.A))
         {
             Walk();
         }
@@ -45,7 +46,7 @@ public class Player : RoleBase
     void FixedUpdate()
     {
 
-        float h = Input.GetAxis("Horizontal");
+        float h = XCI.GetAxis(XboxAxis.LeftStickX );
 
         m_Animator.SetFloat("Speed", Mathf.Abs(h));
 
